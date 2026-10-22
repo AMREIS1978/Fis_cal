@@ -1,0 +1,27 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+      - name: Build EXE
+        shell: pwsh
+        run: |
+          $env:CGO_ENABLED='0'
+          go build -trimpath -ldflags='-s -w -H=windowsgui' -o Direcao_e_Fiscalizacao_de_Obra.exe .
+          Get-Item .\Direcao_e_Fiscalizacao_de_Obra.exe | Format-List Name,Length
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Direcao-e-Fiscalizacao-de-Obra-Windows
+          path: Direcao_e_Fiscalizacao_de_Obra.exe
+          if-no-files-found: error
