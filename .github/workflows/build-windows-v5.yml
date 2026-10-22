@@ -1,0 +1,29 @@
+name: Build Windows EXE v5
+
+on:
+  push:
+    paths:
+      - 'main_v5.go'
+      - '.github/workflows/build-windows-v5.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+      - name: Build EXE
+        shell: pwsh
+        run: |
+          $env:CGO_ENABLED='0'
+          go build -trimpath -ldflags='-s -w -H=windowsgui' -o Direcao_e_Fiscalizacao_de_Obra_v5.exe main_v5.go
+          if (!(Test-Path Direcao_e_Fiscalizacao_de_Obra_v5.exe)) { throw 'EXE not generated' }
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Direcao-e-Fiscalizacao-de-Obra-v5
+          path: Direcao_e_Fiscalizacao_de_Obra_v5.exe
+          if-no-files-found: error
